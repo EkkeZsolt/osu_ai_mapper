@@ -1,0 +1,48 @@
+# A .python-version a 3.12.14 64 bites interpreterre mutat.
+# A gépen lévő 3.12.13 32 bites, arra nincs CUDA-s PyTorch kerék.
+
+[project]
+name = "osu-ai-mapper"
+version = "0.1.0"
+description = "Helyi, magyar Mapperatorinator beatmap-generáló notebook"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "accelerate==1.12.0",
+    "datasets==4.8.3",
+    "einops==0.8.1",
+    "hf-xet==1.4.2",
+    "huggingface-hub==0.36.2",
+    "hydra-core==1.3.2",
+    "ipykernel>=6.29",
+    "ipywidgets>=8.1",
+    "jupyterlab>=4.3",
+    "lightning==2.6.0",
+    "matplotlib==3.10.8",
+    "nnAudio==0.3.4",
+    "pandas==2.3.3",
+    "peft==0.18.1",
+    "pyarrow==22.0.0",
+    "pydub==0.25.1",
+    "pyyaml==6.0.3",
+    "rich==14.2.0",
+    "rosu-pp-py==3.1.0",
+    "slider",
+    "torch==2.10.0",
+    "torchaudio==2.10.0",
+    "torchcodec==0.10.0",
+    "transformers==4.57.3",
+    "wandb==0.24.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchaudio = { index = "pytorch-cu128" }
+slider = { git = "https://github.com/OliBomby/slider.git" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

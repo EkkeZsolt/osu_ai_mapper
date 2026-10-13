@@ -1,0 +1,12 @@
+.venv/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+kimenet/
+beallitasok.json
+eszkozok/
+
+Mapperatorinator/
+logs/
+wandb/
