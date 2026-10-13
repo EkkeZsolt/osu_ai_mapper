@@ -1,4 +1,9 @@
-# A Mapperatorinator notebook indítása az uv környezetből.
+# A Mapperatorinator Streamlit felületének indítása.
+param(
+    [ValidateSet("hu", "en")]
+    [string]$Nyelv = "hu"
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $gyoker = Split-Path -Parent $PSScriptRoot
@@ -12,4 +17,5 @@ if (-not (Test-Path ".\.venv\Scripts\python.exe")) {
     Write-Error "Még nincs telepítve a környezet. Futtasd: .\scripts\install.ps1"
 }
 
-uv run jupyter lab "mapperatorinator_inference.ipynb"
+$env:OSU_AI_LANG = $Nyelv
+uv run streamlit run src/app.py --browser.gatherUsageStats false
