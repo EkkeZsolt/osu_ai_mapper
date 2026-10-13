@@ -21,8 +21,8 @@ uv sync
 
 $repo = Join-Path $gyoker "Mapperatorinator"
 if (-not (Test-Path (Join-Path $repo "inference.py"))) {
-    Write-Host "Mapperatorinator letöltése..."
-    git clone --depth 1 "https://github.com/OliBomby/Mapperatorinator.git" $repo
+    Write-Host "Mapperatorinator almodul letöltése..."
+    git submodule update --init --depth 1
 }
 
 $ffmpegExe = Join-Path $gyoker "eszkozok\ffmpeg\bin\ffmpeg.exe"

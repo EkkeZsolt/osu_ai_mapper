@@ -40,7 +40,7 @@ package = false
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
 torchaudio = { index = "pytorch-cu128" }
-slider = { git = "https://github.com/OliBomby/slider.git" }
+slider = { git = "https://github.com/OliBomby/slider.git", rev = "ea28c484a0a542d6e094e25aa02e1529ff2c8313" }
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
