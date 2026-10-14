@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 import time
 import traceback
@@ -15,6 +16,16 @@ KIMENET = PROJEKT / "kimenet"
 TESZT = PROJEKT / "teszt"
 
 HANG_KITERJESZTES = {".mp3", ".ogg", ".wav", ".flac", ".m4a"}
+NIGHTCORE_SZORZO = 1.25
+SZEVALASZT_MODELLEK = (
+    "Kim_Vocal_2.onnx",
+    "6_HP-Karaoke-UVR.pth",
+    "htdemucs.yaml",
+    "htdemucs_ft.yaml",
+)
+SZEVALASZT_DEMUCS = {"htdemucs.yaml", "htdemucs_ft.yaml"}
+SZEVALASZT_SAVOK = ("Vocals", "Instrumental")
+MODELL_MAPPA = PROJEKT / "eszkozok" / "audio-separator-modellek"
 
 
 def teszt_hang() -> Path | None:
@@ -141,6 +152,235 @@ def elokeszit():
     import inference  # noqa: F401
 
 
+def _parancs(argv: list[str]) -> subprocess.CompletedProcess[str]:
+    jelzok = {}
+    if os.name == "nt":
+        jelzok["creationflags"] = subprocess.CREATE_NO_WINDOW
+    return subprocess.run(
+        argv,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        **jelzok,
+    )
+
+
+def _ffmpeg_ut() -> tuple[Path, Path]:
+    ffmpeg = FFMPEG_BIN / "ffmpeg.exe"
+    ffprobe = FFMPEG_BIN / "ffprobe.exe"
+    if not ffmpeg.is_file() or not ffprobe.is_file():
+        raise RuntimeError("Hiányzik az FFmpeg. Futtasd: .\\scripts\\install.ps1")
+    if str(FFMPEG_BIN) not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = str(FFMPEG_BIN) + os.pathsep + os.environ.get("PATH", "")
+    if hasattr(os, "add_dll_directory"):
+        os.add_dll_directory(str(FFMPEG_BIN))
+    return ffmpeg, ffprobe
+
+
+def _mintavetel(ffprobe: Path, hang: Path) -> int:
+    eredmeny = _parancs(
+        [
+            str(ffprobe),
+            "-v",
+            "error",
+            "-select_streams",
+            "a:0",
+            "-show_entries",
+            "stream=sample_rate",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(hang),
+        ]
+    )
+    sorok = [sor.strip() for sor in (eredmeny.stdout or "").splitlines() if sor.strip()]
+    if eredmeny.returncode != 0 or not sorok:
+        raise RuntimeError("A hang mintavételezése nem olvasható.")
+    try:
+        rata = int(sorok[0])
+    except ValueError:
+        raise RuntimeError("A hang mintavételezése nem olvasható.") from None
+    if rata <= 0:
+        raise RuntimeError("A hang mintavételezése nem olvasható.")
+    return rata
+
+
+def _hang_a_beatmapbol(beatmap: str) -> str | None:
+    ut = Path(beatmap)
+    try:
+        szoveg = ut.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError:
+        return None
+    for sor in szoveg.splitlines():
+        if sor.startswith("AudioFilename:"):
+            nev = sor.split(":", 1)[1].strip()
+            if not nev:
+                return None
+            hang = ut.parent / nev
+            return str(hang) if hang.is_file() else None
+        if sor.strip() == "[TimingPoints]":
+            break
+    return None
+
+
+def nightcore(hang: str | None, kimenet: str | None = None) -> Path:
+    """1.25× tempó és hangmagasság, majd szabványos mintavételezésű MP3."""
+    ut = _szoveg(hang)
+    if not ut:
+        raise RuntimeError("Adj meg egy hangfájlt.")
+    bemenet = Path(ut)
+    if not bemenet.is_file():
+        raise RuntimeError(f"A hangfájl nem található: {hang}")
+    if bemenet.suffix.lower() not in HANG_KITERJESZTES:
+        raise RuntimeError("A hang legyen mp3, ogg, wav, flac vagy m4a.")
+
+    ffmpeg, ffprobe = _ffmpeg_ut()
+    rata = _mintavetel(ffprobe, bemenet)
+    cel_rata = 48000 if rata == 48000 else 44100
+    mappa = Path(_szoveg(kimenet) or str(KIMENET))
+    mappa.mkdir(parents=True, exist_ok=True)
+    cel = mappa / f"{bemenet.stem}_nightcore.mp3"
+    eredmeny = _parancs(
+        [
+            str(ffmpeg),
+            "-y",
+            "-i",
+            str(bemenet),
+            "-vn",
+            "-filter:a",
+            f"asetrate={rata}*{NIGHTCORE_SZORZO},aresample={cel_rata}",
+            "-c:a",
+            "libmp3lame",
+            "-q:a",
+            "0",
+            str(cel),
+        ]
+    )
+    if eredmeny.returncode != 0 or not cel.is_file():
+        sor = next((sor.strip() for sor in reversed((eredmeny.stderr or "").splitlines()) if sor.strip()), "")
+        uzenet = "A Nightcore konverzió sikertelen."
+        if sor:
+            uzenet = f"{uzenet} {sor}"
+        raise RuntimeError(uzenet)
+    return cel
+
+
+def _tiszta_nev(nev: str) -> str:
+    import re
+
+    tiszta = re.sub(r'[<>:"/\\|?*]', "_", nev)
+    tiszta = re.sub(r"_+", "_", tiszta).strip("_. ")
+    return f"{tiszta}.wav"
+
+
+def _cuda_dll() -> None:
+    """Az ONNX Runtime a Torch CUDA 12-es könyvtárait használja."""
+    try:
+        import torch
+    except Exception:
+        return
+    lib = Path(torch.__file__).resolve().parent / "lib"
+    if not lib.is_dir():
+        return
+    if str(lib) not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = str(lib) + os.pathsep + os.environ.get("PATH", "")
+    if hasattr(os, "add_dll_directory"):
+        os.add_dll_directory(str(lib))
+
+
+def _pydub_ffmpeg() -> None:
+    ffmpeg, ffprobe = _ffmpeg_ut()
+    from pydub import AudioSegment
+
+    AudioSegment.converter = str(ffmpeg)
+    AudioSegment.ffprobe = str(ffprobe)
+
+
+def _alap_osszege(mappa: Path, alap: Path, reszek: list[Path]) -> None:
+    letezo = [ut for ut in reszek if ut.is_file()]
+    if not letezo:
+        raise RuntimeError("A zenei alap sávjai nem készültek el.")
+    if len(letezo) == 1:
+        letezo[0].replace(alap)
+        return
+    ffmpeg, _ = _ffmpeg_ut()
+    bemenetek: list[str] = []
+    for ut in letezo:
+        bemenetek.extend(["-i", str(ut)])
+    szuro = "".join(f"[{i}:a]" for i in range(len(letezo)))
+    szuro += f"amix=inputs={len(letezo)}:duration=longest:normalize=0"
+    eredmeny = _parancs([str(ffmpeg), "-y", *bemenetek, "-filter_complex", szuro, "-c:a", "pcm_s16le", str(alap)])
+    if eredmeny.returncode != 0 or not alap.is_file():
+        sor = next((sor.strip() for sor in reversed((eredmeny.stderr or "").splitlines()) if sor.strip()), "")
+        uzenet = "A zenei alap összeadása sikertelen."
+        if sor:
+            uzenet = f"{uzenet} {sor}"
+        raise RuntimeError(uzenet)
+    for ut in letezo:
+        ut.unlink(missing_ok=True)
+
+
+def szetvalaszt(hang: str | None, kimenet: str | None, modell: str | None, sav: str | None) -> Path:
+    """Ének és zenei alap. A visszaadott út a map hangja."""
+    ut = _szoveg(hang)
+    if not ut:
+        raise RuntimeError("Adj meg egy hangfájlt.")
+    bemenet = Path(ut)
+    if not bemenet.is_file():
+        raise RuntimeError(f"A hangfájl nem található: {hang}")
+    if bemenet.suffix.lower() not in HANG_KITERJESZTES:
+        raise RuntimeError("A hang legyen mp3, ogg, wav, flac vagy m4a.")
+    modell = _szoveg(modell) or ""
+    sav = _szoveg(sav) or ""
+    if modell not in SZEVALASZT_MODELLEK:
+        raise RuntimeError("Ismeretlen szétválasztó modell.")
+    if sav not in SZEVALASZT_SAVOK:
+        raise RuntimeError("A sáv ének vagy zenei alap legyen.")
+
+    mappa = Path(_szoveg(kimenet) or str(KIMENET))
+    mappa.mkdir(parents=True, exist_ok=True)
+    MODELL_MAPPA.mkdir(parents=True, exist_ok=True)
+    _cuda_dll()
+    _pydub_ffmpeg()
+
+    import logging
+
+    from audio_separator.separator import Separator
+
+    nevek = {
+        "Vocals": f"{bemenet.stem}_(Vocals)",
+        "Instrumental": f"{bemenet.stem}_(Instrumental)",
+        "Drums": f"{bemenet.stem}_(Drums)",
+        "Bass": f"{bemenet.stem}_(Bass)",
+        "Other": f"{bemenet.stem}_(Other)",
+    }
+    try:
+        elvalaszto = Separator(
+            log_level=logging.WARNING,
+            output_dir=str(mappa),
+            output_format="WAV",
+            model_file_dir=str(MODELL_MAPPA),
+        )
+        elvalaszto.load_model(model_filename=modell)
+        elvalaszto.separate(str(bemenet), nevek)
+    except Exception as hiba:
+        raise RuntimeError(f"A szétválasztás sikertelen. {hiba}") from hiba
+
+    vokalis = mappa / _tiszta_nev(nevek["Vocals"])
+    alap = mappa / _tiszta_nev(nevek["Instrumental"])
+    if modell in SZEVALASZT_DEMUCS and not alap.is_file():
+        _alap_osszege(
+            mappa,
+            alap,
+            [mappa / _tiszta_nev(nevek[nev]) for nev in ("Drums", "Bass", "Other")],
+        )
+    cel = vokalis if sav == "Vocals" else alap
+    if not cel.is_file():
+        raise RuntimeError("A választott sáv nem készült el.")
+    return cel
+
+
 def futtat(beallitas: dict, frissit=None, megnyit: bool = True) -> Path:
     if not beallitas.get("elfogadva"):
         raise RuntimeError("A generálás előtt fogadd el a szabályt.")
@@ -161,6 +401,32 @@ def futtat(beallitas: dict, frissit=None, megnyit: bool = True) -> Path:
     veg = _szam(beallitas.get("veg"), egesz=True)
     if kezdet is not None and veg is not None and kezdet >= veg:
         raise RuntimeError("A szakasz vége később legyen, mint a kezdete.")
+
+    if beallitas.get("nightcore") and beallitas.get("szetvalaszt"):
+        raise RuntimeError("A Nightcore és a szétválasztás együtt nem fut.")
+
+    if beallitas.get("szetvalaszt"):
+        forras = hang or (_hang_a_beatmapbol(beatmap) if beatmap else None)
+        if not forras or not Path(forras).is_file():
+            raise RuntimeError("Adj meg egy hangfájlt, vagy egy .osu-t, ami mellett ott a dal.")
+        if frissit is not None:
+            frissit("Szétválasztás: ének és zenei alap.\n")
+        hang = str(
+            szetvalaszt(
+                forras,
+                kimenet,
+                beallitas.get("szetvalaszt_modell"),
+                beallitas.get("szetvalaszt_sav"),
+            )
+        )
+
+    if beallitas.get("nightcore"):
+        forras = hang or (_hang_a_beatmapbol(beatmap) if beatmap else None)
+        if not forras or not Path(forras).is_file():
+            raise RuntimeError("Adj meg egy hangfájlt, vagy egy .osu-t, ami mellett ott a dal.")
+        if frissit is not None:
+            frissit("Nightcore: a tempó és a hangmagasság 1.25×-esre nő.\n")
+        hang = str(nightcore(forras, kimenet))
 
     modell = beallitas.get("modell", "v32")
     elokeszit()
