@@ -74,6 +74,14 @@ SZOVEG = {
         "verzio": "Nehézség neve",
         "forras": "Forrás",
         "gomb": "Beatmap generálása",
+        "nightcore": "Nightcore",
+        "nightcore_sugo": "A map előtt a tempó és a hangmagasság együtt 1.25×-esre nő, kb. 3–4 félhanggal.",
+        "szetvalaszt": "Szétválasztás",
+        "szetvalaszt_sugo": "A map előtt külön ének és zenei alap készül. A Nightcore közben nem kapcsolható.",
+        "szetvalaszt_modell": "Szétválasztó modell",
+        "szetvalaszt_sav": "A map sávja",
+        "enek": "Ének",
+        "alap": "Zenei alap",
         "folyamat": "Generálás",
         "kesz": "Kész",
         "hiba": "Hiba",
@@ -138,6 +146,14 @@ SZOVEG = {
         "verzio": "Version",
         "forras": "Source",
         "gomb": "Generate beatmap",
+        "nightcore": "Nightcore",
+        "nightcore_sugo": "Before the map, tempo and pitch rise together by 1.25×, about 3–4 semitones.",
+        "szetvalaszt": "Separate",
+        "szetvalaszt_sugo": "Vocals and instrumental are split before the map. Nightcore stays off while this is on.",
+        "szetvalaszt_modell": "Separation model",
+        "szetvalaszt_sav": "Stem for the map",
+        "enek": "Vocals",
+        "alap": "Instrumental",
         "folyamat": "Generating",
         "kesz": "Done",
         "hiba": "Error",
@@ -214,6 +230,21 @@ FELADATOK = {
     },
 }
 
+SZEVALASZT_FELIRAT = {
+    "hu": {
+        "Kim_Vocal_2.onnx": "Kim Vocal 2, tiszta",
+        "6_HP-Karaoke-UVR.pth": "Karaoke",
+        "htdemucs.yaml": "htdemucs",
+        "htdemucs_ft.yaml": "htdemucs, finomhangolt",
+    },
+    "en": {
+        "Kim_Vocal_2.onnx": "Kim Vocal 2, clean",
+        "6_HP-Karaoke-UVR.pth": "Karaoke",
+        "htdemucs.yaml": "htdemucs",
+        "htdemucs_ft.yaml": "htdemucs, fine-tuned",
+    },
+}
+
 KONTEXTUSOK = ["[NONE]", "[TIMING]", "[TIMING,KIAI]", "[TIMING,KIAI,MAP]", "[GD,TIMING]", "[NO_HS,TIMING]"]
 KIMENETEK = {
     "v32": ["[TIMING,MAP,SV]", "[MAP]", "[TIMING]"],
@@ -257,6 +288,8 @@ def alapok():
     hang = futtatas.teszt_hang()
     st.session_state.setdefault("nyelv", os.environ.get("OSU_AI_LANG", "hu"))
     st.session_state.setdefault("feladat", "uj")
+    if st.session_state.feladat not in FELADATOK:
+        st.session_state.feladat = "uj"
     st.session_state.setdefault("elfogadom", False)
     st.session_state.setdefault("hang", str(hang) if hang else "")
     st.session_state.setdefault("beatmap", "")
@@ -293,6 +326,20 @@ def alapok():
     st.session_state.setdefault("bpm_kuszob", 0.1)
     st.session_state.setdefault("keszito", "Mapperatorinator")
     st.session_state.setdefault("diff_verzio", "AI")
+    st.session_state.setdefault("nightcore", False)
+    st.session_state.setdefault("szetvalaszt", False)
+    st.session_state.setdefault("szetvalaszt_modell", "Kim_Vocal_2.onnx")
+    st.session_state.setdefault("szetvalaszt_sav", "Vocals")
+
+
+def nightcore_katt():
+    if st.session_state.nightcore:
+        st.session_state.szetvalaszt = False
+
+
+def szetvalaszt_katt():
+    if st.session_state.szetvalaszt:
+        st.session_state.nightcore = False
 
 
 def feladat_valtozott():
@@ -332,6 +379,38 @@ def main():
 
     st.text_input(t("hang"), key="hang", help=t("hang_sugo"))
     feltoltve = st.file_uploader(t("feltoltes"), type=["mp3", "ogg", "wav", "flac", "m4a"])
+    st.checkbox(
+        t("nightcore"),
+        key="nightcore",
+        help=t("nightcore_sugo"),
+        disabled=bool(st.session_state.szetvalaszt),
+        on_change=nightcore_katt,
+    )
+    st.checkbox(
+        t("szetvalaszt"),
+        key="szetvalaszt",
+        help=t("szetvalaszt_sugo"),
+        disabled=bool(st.session_state.nightcore),
+        on_change=szetvalaszt_katt,
+    )
+    if st.session_state.szetvalaszt:
+        if st.session_state.szetvalaszt_modell not in futtatas.SZEVALASZT_MODELLEK:
+            st.session_state.szetvalaszt_modell = futtatas.SZEVALASZT_MODELLEK[0]
+        if st.session_state.szetvalaszt_sav not in futtatas.SZEVALASZT_SAVOK:
+            st.session_state.szetvalaszt_sav = futtatas.SZEVALASZT_SAVOK[0]
+        valaszto = st.columns(2)
+        valaszto[0].selectbox(
+            t("szetvalaszt_modell"),
+            list(futtatas.SZEVALASZT_MODELLEK),
+            format_func=lambda fajl: SZEVALASZT_FELIRAT[nyelv].get(fajl, fajl),
+            key="szetvalaszt_modell",
+        )
+        valaszto[1].selectbox(
+            t("szetvalaszt_sav"),
+            list(futtatas.SZEVALASZT_SAVOK),
+            format_func=lambda sav: t("enek") if sav == "Vocals" else t("alap"),
+            key="szetvalaszt_sav",
+        )
     st.text_input(t("beatmap"), key="beatmap", help=t("beatmap_sugo"))
     st.text_input(t("kimenet"), key="kimenet")
 
@@ -412,6 +491,10 @@ def main():
             "modell": st.session_state.modell,
             "jatekmod": int(st.session_state.jatekmod),
             "hang": hang,
+            "nightcore": bool(st.session_state.nightcore),
+            "szetvalaszt": bool(st.session_state.szetvalaszt),
+            "szetvalaszt_modell": st.session_state.szetvalaszt_modell,
+            "szetvalaszt_sav": st.session_state.szetvalaszt_sav,
             "beatmap": st.session_state.beatmap,
             "kimenet": st.session_state.kimenet,
             "kontextus": st.session_state.kontextus,

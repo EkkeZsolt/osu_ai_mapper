@@ -8,6 +8,8 @@ description = "Helyi, magyar Mapperatorinator beatmap-generáló notebook"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "accelerate==1.12.0",
+    "audio-separator[gpu]; sys_platform != 'darwin'",
+    "audioread>=3.0",
     "datasets==4.8.3",
     "einops==0.8.1",
     "hf-xet==1.4.2",
@@ -19,6 +21,7 @@ dependencies = [
     "lightning==2.6.0",
     "matplotlib==3.10.8",
     "nnAudio==0.3.4",
+    "onnxruntime-gpu>=1.22.0,<1.23",
     "pandas==2.3.3",
     "peft==0.18.1",
     "pyarrow==22.0.0",
@@ -31,16 +34,21 @@ dependencies = [
     "torch==2.10.0",
     "torchaudio==2.10.0",
     "torchcodec==0.10.0",
+    "torchvision==0.25.0",
     "transformers==4.57.3",
     "wandb==0.24.2",
 ]
 
 [tool.uv]
 package = false
+# Az audio-separator Apple Siliconon Torch 2.13-at kér, a projekt Torch 2.10 CUDA 12.8-on fut.
+environments = ["sys_platform == 'win32'", "sys_platform == 'linux' and platform_machine == 'x86_64'"]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
 torchaudio = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+audio-separator = { git = "https://github.com/nomadkaraoke/python-audio-separator.git", rev = "45127bd2504819373f4108df08ca100fe4c23e81" }
 slider = { git = "https://github.com/OliBomby/slider.git", rev = "ea28c484a0a542d6e094e25aa02e1529ff2c8313" }
 
 [[tool.uv.index]]
