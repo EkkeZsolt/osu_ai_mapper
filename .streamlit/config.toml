@@ -1,0 +1,3 @@
+[logger]
+# Elrejti az indításkori Streamlit-üzenetet, benne a "streamlit skills" reklámmal.
+hideWelcomeMessage = true

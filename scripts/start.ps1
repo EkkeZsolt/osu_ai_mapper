@@ -1,6 +1,6 @@
 # A Mapperatorinator Streamlit felületének indítása.
 param(
-    [ValidateSet("hu", "en")]
+    [ValidateSet("hu", "en", "de", "ru")]
     [string]$Nyelv = "hu"
 )
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -26,6 +27,75 @@ SZEVALASZT_MODELLEK = (
 SZEVALASZT_DEMUCS = {"htdemucs.yaml", "htdemucs_ft.yaml"}
 SZEVALASZT_SAVOK = ("Vocals", "Instrumental")
 MODELL_MAPPA = PROJEKT / "eszkozok" / "audio-separator-modellek"
+
+
+def _osu_mezok(beatmap: Path) -> dict[str, str]:
+    try:
+        szoveg = beatmap.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError:
+        return {}
+    mezok = {}
+    for sor in szoveg.splitlines():
+        cimke = sor.strip()
+        if cimke.startswith("[") and cimke not in ("[General]", "[Editor]", "[Metadata]", "[Difficulty]"):
+            break
+        if ":" not in sor:
+            continue
+        kulcs, ertek = sor.split(":", 1)
+        ertek = ertek.strip()
+        if ertek:
+            mezok[kulcs.strip()] = ertek
+    return mezok
+
+
+def _hang_cimkek(hang: Path) -> dict[str, str]:
+    try:
+        _, ffprobe = _ffmpeg_ut()
+    except RuntimeError:
+        return {}
+    eredmeny = _parancs(
+        [
+            str(ffprobe),
+            "-v",
+            "error",
+            "-show_entries",
+            "format_tags",
+            "-of",
+            "json",
+            str(hang),
+        ]
+    )
+    if eredmeny.returncode != 0:
+        return {}
+    try:
+        adat = json.loads(eredmeny.stdout or "{}")
+    except json.JSONDecodeError:
+        return {}
+    tagek = (adat.get("format") or {}).get("tags") or {}
+    return {str(kulcs).casefold(): str(ertek).strip() for kulcs, ertek in tagek.items() if str(ertek).strip()}
+
+
+def metaadatok(hang: str | None, beatmap: str | None) -> dict[str, str]:
+    """Cím, előadó, készítő, nehézség és forrás a .osu-ból, különben a hang címkéiből."""
+    osu: dict[str, str] = {}
+    if beatmap:
+        ut = Path(beatmap)
+        if ut.is_file() and ut.suffix.lower() == ".osu":
+            osu = _osu_mezok(ut)
+    audio: dict[str, str] = {}
+    hang_ut = Path(hang) if hang else None
+    if hang_ut and hang_ut.is_file() and hang_ut.suffix.lower() in HANG_KITERJESZTES:
+        audio = _hang_cimkek(hang_ut)
+    cim = osu.get("TitleUnicode") or osu.get("Title") or audio.get("title") or ""
+    if not cim and hang_ut and hang_ut.is_file():
+        cim = hang_ut.stem
+    return {
+        "dalcim": cim,
+        "eloado_nev": osu.get("ArtistUnicode") or osu.get("Artist") or audio.get("artist") or audio.get("album_artist") or "",
+        "keszito": osu.get("Creator") or "",
+        "diff_verzio": osu.get("Version") or "",
+        "forras": osu.get("Source") or audio.get("album") or "",
+    }
 
 
 def teszt_hang() -> Path | None:
