@@ -1,4 +1,4 @@
-"""Helyi Mapperatorinator felület. Magyar és angol."""
+"""Helyi Mapperatorinator felület. Magyar, angol, német és orosz."""
 
 from __future__ import annotations
 
@@ -159,14 +159,162 @@ SZOVEG = {
         "hiba": "Error",
         "nincs": "none",
     },
+    "de": {
+        "cim": "Beatmap erzeugen",
+        "szabaly": "Ich kennzeichne die Verwendung von KI in der Beatmap.",
+        "elfogadom": "Ich akzeptiere",
+        "nyelv": "Sprache",
+        "feladat": "Aufgabe",
+        "hang": "Audio",
+        "hang_sugo": "Leer lassen, wenn die Audiodatei neben der .osu liegt. Die Datei in teszt/ ist der Standard.",
+        "feltoltes": "Oder eine Audiodatei hochladen",
+        "beatmap": "Referenz-.osu",
+        "beatmap_sugo": "Nötig für In-Context und zum Neuschreiben eines Abschnitts. Stable: File → Open Song Folder. Lazer: File → Edit Externally.",
+        "kimenet": "Ausgabeordner",
+        "modell": "Modell",
+        "modell_sugo": "V32 ist das beste Modell. V30 kann nur osu!standard, ohne Tags und ohne In-Context.",
+        "mod": "Spielmodus",
+        "nehezseg": "Sternewert",
+        "nehezseg_sugo": "−1 lässt ihn unbekannt. Das Ergebnis kann abweichen.",
+        "mapper": "Mapper-ID",
+        "ev": "Jahr",
+        "lora": "LoRA",
+        "cimkek": "Tags",
+        "cimkek_sugo": "Leer: das Modell entscheidet, oder die Tags der Referenz bleiben.",
+        "negativ": "Negative Tags",
+        "negativ_sugo": "Wirken nur, wenn cfg größer als 1 ist.",
+        "minden": "Tags aller Spielmodi",
+        "nehezseg_panel": "Schwierigkeit",
+        "generalas_panel": "Erzeugung",
+        "meta": "Metadaten",
+        "kontextus": "Kontext",
+        "kimenet_tipus": "Ausgabe",
+        "hozzaad": "Zur Referenzmap hinzufügen",
+        "osz": ".osz-Paket",
+        "felulir": "Die ursprüngliche .osu überschreiben",
+        "kezdet": "Start (ms), −1 = Anfang",
+        "veg": "Ende (ms), −1 = Ende",
+        "cfg": "Cfg",
+        "homerseklet": "Temperatur",
+        "seed": "Seed, −1 = zufällig",
+        "timing": "Timing-Toleranz (ms)",
+        "super": "Super-Timing",
+        "sugarak": "Super-Timing-Strahlen",
+        "iteraciok": "Super-Timing-Wiederholungen",
+        "bpm": "Schwelle für BPM-Wechsel",
+        "hp": "HP",
+        "cs": "CS",
+        "od": "OD",
+        "ar": "AR",
+        "sv": "SV",
+        "tick": "Slider-Tick",
+        "kulcs": "Mania-Tasten",
+        "hold": "Hold-Anteil, −1 = automatisch",
+        "scroll": "Scroll-Anteil, −1 = automatisch",
+        "hitsound": "Hitsounds",
+        "dalcim": "Titel",
+        "eloado": "Künstler",
+        "keszito": "Ersteller",
+        "verzio": "Schwierigkeitsname",
+        "forras": "Quelle",
+        "gomb": "Beatmap erzeugen",
+        "nightcore": "Nightcore",
+        "nightcore_sugo": "Vor der Map steigen Tempo und Tonhöhe gemeinsam um 1,25×, etwa 3–4 Halbtöne.",
+        "szetvalaszt": "Trennung",
+        "szetvalaszt_sugo": "Vor der Map werden Gesang und Instrumental getrennt. Nightcore ist dabei aus.",
+        "szetvalaszt_modell": "Trennungsmodell",
+        "szetvalaszt_sav": "Spur für die Map",
+        "enek": "Gesang",
+        "alap": "Instrumental",
+        "folyamat": "Erzeugung",
+        "kesz": "Fertig",
+        "hiba": "Fehler",
+        "nincs": "keine",
+    },
+    "ru": {
+        "cim": "Создание битмапа",
+        "szabaly": "Я всегда указываю использование ИИ в битмапе.",
+        "elfogadom": "Принимаю",
+        "nyelv": "Язык",
+        "feladat": "Задача",
+        "hang": "Аудио",
+        "hang_sugo": "Можно оставить пустым, если файл лежит рядом с .osu. По умолчанию берётся файл из teszt/.",
+        "feltoltes": "Или загрузите аудиофайл",
+        "beatmap": "Эталонный .osu",
+        "beatmap_sugo": "Нужен для in-context и переписывания фрагмента. Stable: File → Open Song Folder. Lazer: File → Edit Externally.",
+        "kimenet": "Папка вывода",
+        "modell": "Модель",
+        "modell_sugo": "V32 — лучшая модель. V30 умеет только osu!standard, без тегов и in-context.",
+        "mod": "Режим",
+        "nehezseg": "Звёзды",
+        "nehezseg_sugo": "−1 оставляет значение неизвестным. Результат может отличаться.",
+        "mapper": "ID маппера",
+        "ev": "Год",
+        "lora": "LoRA",
+        "cimkek": "Теги",
+        "cimkek_sugo": "Пусто: решает модель, либо остаются теги эталона.",
+        "negativ": "Отрицательные теги",
+        "negativ_sugo": "Действуют только при cfg больше 1.",
+        "minden": "Теги всех режимов",
+        "nehezseg_panel": "Сложность",
+        "generalas_panel": "Генерация",
+        "meta": "Метаданные",
+        "kontextus": "Контекст",
+        "kimenet_tipus": "Вывод",
+        "hozzaad": "Добавить к эталонной карте",
+        "osz": "Пакет .osz",
+        "felulir": "Перезаписать исходный .osu",
+        "kezdet": "Начало (мс), −1 = с начала",
+        "veg": "Конец (мс), −1 = до конца",
+        "cfg": "Cfg",
+        "homerseklet": "Температура",
+        "seed": "Seed, −1 = случайно",
+        "timing": "Допуск тайминга (мс)",
+        "super": "Супер-тайминг",
+        "sugarak": "Лучи супер-тайминга",
+        "iteraciok": "Повторы супер-тайминга",
+        "bpm": "Порог смены BPM",
+        "hp": "HP",
+        "cs": "CS",
+        "od": "OD",
+        "ar": "AR",
+        "sv": "SV",
+        "tick": "Slider tick",
+        "kulcs": "Клавиши mania",
+        "hold": "Доля холдов, −1 = автоматически",
+        "scroll": "Доля скролла, −1 = автоматически",
+        "hitsound": "Хитсаунды",
+        "dalcim": "Название",
+        "eloado": "Исполнитель",
+        "keszito": "Автор",
+        "verzio": "Название сложности",
+        "forras": "Источник",
+        "gomb": "Создать битмап",
+        "nightcore": "Nightcore",
+        "nightcore_sugo": "Перед картой темп и высота вместе растут в 1,25 раза, примерно на 3–4 полутона.",
+        "szetvalaszt": "Разделение",
+        "szetvalaszt_sugo": "Перед картой вокал и инструментал разделяются. Nightcore при этом выключен.",
+        "szetvalaszt_modell": "Модель разделения",
+        "szetvalaszt_sav": "Дорожка для карты",
+        "enek": "Вокал",
+        "alap": "Инструментал",
+        "folyamat": "Генерация",
+        "kesz": "Готово",
+        "hiba": "Ошибка",
+        "nincs": "нет",
+    },
 }
 
 FELADATOK = {
     "uj": {
         "hu": "Új beatmap",
         "en": "New beatmap",
+        "de": "Neue Beatmap",
+        "ru": "Новый битмап",
         "leiras_hu": "Timing, kiai nélkül: objektumok és slider velocity. A V32 ezt a hármat tudja. Elég a hang.",
         "leiras_en": "Timing, hit objects, and slider velocity. V32 has no separate kiai output. Audio is enough.",
+        "leiras_de": "Timing, Objekte und Slider-Velocity. V32 hat keine eigene Kiai-Ausgabe. Audio genügt.",
+        "leiras_ru": "Тайминг, объекты и slider velocity. У V32 нет отдельного kiai. Достаточно аудио.",
         "kontextus": "[NONE]",
         "kimenet": "[TIMING,MAP,SV]",
         "hozzaad": False,
@@ -176,8 +324,12 @@ FELADATOK = {
     "timing": {
         "hu": "Csak timing",
         "en": "Timing only",
+        "de": "Nur Timing",
+        "ru": "Только тайминг",
         "leiras_hu": "Lassabb, pontosabb szuper timing. Változó BPM-hez.",
         "leiras_en": "Slower, more accurate super timing. Use this for variable BPM.",
+        "leiras_de": "Langsameres, genaueres Super-Timing. Für wechselndes BPM.",
+        "leiras_ru": "Более медленный и точный супер-тайминг. Для переменного BPM.",
         "kontextus": "[NONE]",
         "kimenet": "[TIMING]",
         "hozzaad": False,
@@ -187,8 +339,12 @@ FELADATOK = {
     "vendeg": {
         "hu": "Vendég nehézség",
         "en": "Guest difficulty",
+        "de": "Gast-Schwierigkeit",
+        "ru": "Гостевая сложность",
         "leiras_hu": "A V31 tudja igazán. Kell egy .osu ugyanabból a szettből.",
         "leiras_en": "Works properly on V31. Needs a .osu from the same mapset.",
+        "leiras_de": "Funktioniert richtig mit V31. Braucht eine .osu aus demselben Mapset.",
+        "leiras_ru": "По-настоящему работает на V31. Нужен .osu из того же сета.",
         "kontextus": "[GD,TIMING]",
         "kimenet": "[MAP]",
         "hozzaad": False,
@@ -198,8 +354,12 @@ FELADATOK = {
     "hitsound": {
         "hu": "Hitsound",
         "en": "Hitsounds",
+        "de": "Hitsounds",
+        "ru": "Хитсаунды",
         "leiras_hu": "A V31 a kész objektumokra hitsoundot tesz. Kell a .osu.",
         "leiras_en": "V31 adds hitsounds onto the existing objects. The .osu is required.",
+        "leiras_de": "V31 setzt Hitsounds auf die vorhandenen Objekte. Die .osu ist nötig.",
+        "leiras_ru": "V31 ставит хитсаунды на готовые объекты. Нужен .osu.",
         "kontextus": "[NO_HS,TIMING]",
         "kimenet": "[MAP]",
         "hozzaad": False,
@@ -209,8 +369,12 @@ FELADATOK = {
     "szakasz": {
         "hu": "Szakasz",
         "en": "Section",
+        "de": "Abschnitt",
+        "ru": "Фрагмент",
         "leiras_hu": "Egy időintervallum újragenerálása. Kell a .osu, a kezdet és a vég.",
         "leiras_en": "Regenerate a time range. Needs the .osu, plus start and end.",
+        "leiras_de": "Einen Zeitbereich neu erzeugen. Braucht die .osu sowie Start und Ende.",
+        "leiras_ru": "Перегенерация интервала. Нужны .osu, начало и конец.",
         "kontextus": "[TIMING]",
         "kimenet": "[MAP]",
         "hozzaad": True,
@@ -220,8 +384,12 @@ FELADATOK = {
     "egyeni": {
         "hu": "Egyéni",
         "en": "Custom",
+        "de": "Benutzerdefiniert",
+        "ru": "Свои настройки",
         "leiras_hu": "Minden kapcsoló szerkeszthető. A −1 ismeretlent jelent.",
         "leiras_en": "Every control is editable. -1 means unknown.",
+        "leiras_de": "Jeder Schalter ist bearbeitbar. −1 bedeutet unbekannt.",
+        "leiras_ru": "Все переключатели можно менять. −1 значит «неизвестно».",
         "kontextus": "[NONE]",
         "kimenet": "[TIMING,MAP,SV]",
         "hozzaad": False,
@@ -243,7 +411,21 @@ SZEVALASZT_FELIRAT = {
         "htdemucs.yaml": "htdemucs",
         "htdemucs_ft.yaml": "htdemucs, fine-tuned",
     },
+    "de": {
+        "Kim_Vocal_2.onnx": "Kim Vocal 2, sauber",
+        "6_HP-Karaoke-UVR.pth": "Karaoke",
+        "htdemucs.yaml": "htdemucs",
+        "htdemucs_ft.yaml": "htdemucs, feinabgestimmt",
+    },
+    "ru": {
+        "Kim_Vocal_2.onnx": "Kim Vocal 2, чистый",
+        "6_HP-Karaoke-UVR.pth": "Karaoke",
+        "htdemucs.yaml": "htdemucs",
+        "htdemucs_ft.yaml": "htdemucs, дообученный",
+    },
 }
+
+NYELVEK = {"hu": "Magyar", "en": "English", "de": "Deutsch", "ru": "Русский"}
 
 KONTEXTUSOK = ["[NONE]", "[TIMING]", "[TIMING,KIAI]", "[TIMING,KIAI,MAP]", "[GD,TIMING]", "[NO_HS,TIMING]"]
 KIMENETEK = {
@@ -256,25 +438,26 @@ def t(kulcs: str) -> str:
     return SZOVEG[st.session_state.nyelv][kulcs]
 
 
-def cimke_lista(jatekmod: int, mind: bool) -> list[str]:
+def cimke_lista(jatekmod: int, mind: bool) -> tuple[list[str], dict[str, str]]:
+    """A választó értéke mindig az angol címkenév, a felirat nyelvenként változik."""
     if not TAGEK.exists():
-        return []
+        return [""], {}
     tagok = json.loads(TAGEK.read_text(encoding="utf-8"))["tags"]
-    magyar = json.loads(CIMKEK.read_text(encoding="utf-8")) if CIMKEK.exists() else {}
-    lathato = []
-    mar = set()
+    magyar = json.loads(CIMKEK.read_text(encoding="utf-8")) if CIMKEK.exists() and st.session_state.nyelv == "hu" else {}
+    feliratok = {}
     for tag in tagok:
         nev = tag["name"]
-        if nev in mar:
+        if nev in feliratok:
             continue
         szabaly = tag.get("ruleset_id")
         if not mind and szabaly not in (None, jatekmod):
             continue
-        mar.add(nev)
-        felirat = magyar.get(nev, nev) if st.session_state.nyelv == "hu" else nev
-        lathato.append((felirat, nev))
-    lathato.sort(key=lambda par: par[0].casefold())
-    return [""] + [f"{felirat} — {nev}" if felirat != nev else nev for felirat, nev in lathato]
+        felirat = magyar.get(nev) or nev
+        if not isinstance(felirat, str) or not felirat.strip():
+            felirat = nev
+        feliratok[nev] = f"{felirat} — {nev}" if felirat != nev else nev
+    nevek = sorted(feliratok, key=lambda nev: feliratok[nev].casefold())
+    return [""] + nevek, feliratok
 
 
 def cimke_nev(szoveg: str) -> str:
@@ -287,6 +470,8 @@ def cimke_nev(szoveg: str) -> str:
 def alapok():
     hang = futtatas.teszt_hang()
     st.session_state.setdefault("nyelv", os.environ.get("OSU_AI_LANG", "hu"))
+    if st.session_state.nyelv not in SZOVEG:
+        st.session_state.nyelv = "hu"
     st.session_state.setdefault("feladat", "uj")
     if st.session_state.feladat not in FELADATOK:
         st.session_state.feladat = "uj"
@@ -326,6 +511,9 @@ def alapok():
     st.session_state.setdefault("bpm_kuszob", 0.1)
     st.session_state.setdefault("keszito", "Mapperatorinator")
     st.session_state.setdefault("diff_verzio", "AI")
+    st.session_state.setdefault("dalcim", "")
+    st.session_state.setdefault("eloado_nev", "")
+    st.session_state.setdefault("forras", "")
     st.session_state.setdefault("nightcore", False)
     st.session_state.setdefault("szetvalaszt", False)
     st.session_state.setdefault("szetvalaszt_modell", "Kim_Vocal_2.onnx")
@@ -353,6 +541,25 @@ def feladat_valtozott():
     st.session_state.super_timing = adat["super"]
 
 
+def meta_alkalmaz(hang: str, beatmap: str) -> None:
+    forras = (hang or "", beatmap or "")
+    if forras == st.session_state.get("_meta_forras"):
+        return
+    elozo = st.session_state.get("_meta_auto") or {}
+    alap = {"keszito": "Mapperatorinator", "diff_verzio": "AI"}
+    for kulcs, ertek in futtatas.metaadatok(hang, beatmap).items():
+        if not ertek:
+            continue
+        aktualis = st.session_state.get(kulcs, "")
+        if aktualis in ("", elozo.get(kulcs), alap.get(kulcs)):
+            st.session_state[kulcs] = ertek
+    st.session_state["_meta_forras"] = forras
+    st.session_state["_meta_auto"] = {
+        kulcs: st.session_state.get(kulcs, "")
+        for kulcs in ("dalcim", "eloado_nev", "keszito", "diff_verzio", "forras")
+    }
+
+
 def feltoltott_hang(fajl) -> str:
     cel = PROJEKT / "bemenet"
     cel.mkdir(exist_ok=True)
@@ -364,7 +571,7 @@ def feltoltott_hang(fajl) -> str:
 def main():
     st.set_page_config(page_title="Mapperatorinator", layout="wide")
     alapok()
-    nyelv = st.sidebar.radio(t("nyelv"), ["hu", "en"], format_func=lambda kod: "Magyar" if kod == "hu" else "English", key="nyelv")
+    nyelv = st.sidebar.radio(t("nyelv"), list(NYELVEK), format_func=lambda kod: NYELVEK[kod], key="nyelv")
     st.title(t("cim"))
     st.checkbox(t("szabaly"), key="elfogadom")
 
@@ -424,7 +631,7 @@ def main():
     meta[2].text_input(t("lora"), key="lora")
 
     mind = st.checkbox(t("minden"), key="minden_cimke")
-    opciok = cimke_lista(int(st.session_state.jatekmod), bool(mind))
+    opciok, feliratok = cimke_lista(int(st.session_state.jatekmod), bool(mind))
     st.caption(t("cimkek_sugo"))
     valasztott = []
     for index in range(1, 4):
@@ -432,7 +639,7 @@ def main():
         st.session_state.setdefault(kulcs, "")
         if st.session_state[kulcs] not in opciok:
             st.session_state[kulcs] = ""
-        valasztott.append(st.selectbox(f"{index}. {t('cimkek')}", opciok, key=kulcs))
+        valasztott.append(st.selectbox(f"{index}. {t('cimkek')}", opciok, format_func=lambda nev, feliratok=feliratok: feliratok.get(nev, nev), key=kulcs))
     st.caption(t("negativ_sugo"))
     negativ = []
     for index in range(1, 4):
@@ -440,7 +647,7 @@ def main():
         st.session_state.setdefault(kulcs, "")
         if st.session_state[kulcs] not in opciok:
             st.session_state[kulcs] = ""
-        negativ.append(st.selectbox(f"{index}. {t('negativ')}", opciok, key=kulcs))
+        negativ.append(st.selectbox(f"{index}. {t('negativ')}", opciok, format_func=lambda nev, feliratok=feliratok: feliratok.get(nev, nev), key=kulcs))
 
     with st.expander(t("nehezseg_panel")):
         szamok = st.columns(4)
@@ -475,6 +682,9 @@ def main():
         st.slider(t("sugarak"), 1, 4, key="sugarak")
         st.slider(t("iteraciok"), 1, 40, key="iteraciok")
         st.slider(t("bpm"), 0.0, 1.0, step=0.1, key="bpm_kuszob")
+
+    meta_hang = feltoltott_hang(feltoltve) if feltoltve is not None else st.session_state.hang
+    meta_alkalmaz(meta_hang, st.session_state.beatmap)
 
     with st.expander(t("meta")):
         st.text_input(t("dalcim"), key="dalcim")
